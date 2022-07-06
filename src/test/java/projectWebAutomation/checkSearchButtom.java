@@ -12,10 +12,11 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Set;
 
 public class checkSearchButtom extends TestBaseMethods {
 
-    @Test
+    @Test(groups = {"smoke"})
     public void verifyTitleOfPage(){
 
         driver.get("https://www.webstaurantstore.com/");
@@ -44,7 +45,7 @@ public class checkSearchButtom extends TestBaseMethods {
            num+=1;
        }
     }
-    @Test
+    @Test(groups = {"regression"})
     public void sortByCapacity() throws IOException {
         driver.get("https://www.webstaurantstore.com/");
         driver.findElement(By.xpath("//input[@id='searchval']")).click();
@@ -56,7 +57,7 @@ public class checkSearchButtom extends TestBaseMethods {
         FileUtils.copyFile(screenShort,new File("screenshotCapacity"+System.currentTimeMillis()+".png"));
     }
 
-    @Test
+    @Test(groups = {"regression"})
     public void sortAndFilter() throws InterruptedException {
         driver.get("https://www.webstaurantstore.com/");
         driver.findElement(By.xpath("//input[@id='searchval']")).click();
@@ -74,7 +75,7 @@ public class checkSearchButtom extends TestBaseMethods {
        }
     }
 
-    @Test
+    @Test(groups = {"regression"})
     public void sortByShape() throws IOException {
         driver.get("https://www.webstaurantstore.com/");
         driver.findElement(By.xpath("//input[@id='searchval']")).click();
@@ -96,5 +97,70 @@ public class checkSearchButtom extends TestBaseMethods {
         }
     }
 
+    @Test(groups = {"regression","flaky"})
+    public void findAndAddNewest() throws InterruptedException {
+        driver.get("https://www.webstaurantstore.com/");
+        driver.findElement(By.xpath("//a[@data-type='Smallwares']")).click();
+       driver.findElement(By.xpath("//h2[.='Cookware']")).click();
+       driver.findElement(By.xpath("//h2[.='Stock Pots & Accessories']")).click();
+        Select selectSort = new Select(driver.findElement(By.xpath("//select[@id='sort_options']")));
+        selectSort.selectByIndex(5);
+        ((JavascriptExecutor) driver).executeScript("window.scrollBy(0,700)");
+        driver.findElement(By.xpath("(//input[@data-testid='itemAddCartQty'])[1]")).clear();
+        driver.findElement(By.xpath("(//input[@data-testid='itemAddCartQty'])[1]")).sendKeys("100");
+        Thread.sleep(1000);
+        driver.findElement(By.xpath("(//input[@data-testid='itemAddCart'])[1]")).click();
+        String cartNumber = driver.findElement(By.id("cartItemCountSpan")).getText();
+        Assert.assertEquals(cartNumber,"100");
+    }
+
+    @Test(groups = {"regression"})
+    public void findAndAddLowestPrice(){
+        driver.get("https://www.webstaurantstore.com/");
+        driver.findElement(By.xpath("//a[@data-type='Smallwares']")).click();
+        driver.findElement(By.xpath("//h2[.='Baking Supplies']")).click();
+        driver.findElement(By.xpath("//h2[.='Decorating Tools']")).click();
+        ((JavascriptExecutor) driver).executeScript("window.scrollBy(0,1000)");
+        driver.findElement(By.xpath("//span[.='Cake Turntables']")).click();
+        Select selectSort = new Select(driver.findElement(By.xpath("//select[@id='sort_options']")));
+        selectSort.selectByIndex(1);
+        driver.findElement(By.xpath("(//input[@data-testid='itemAddCartQty'])[1]")).clear();
+        driver.findElement(By.xpath("(//input[@data-testid='itemAddCartQty'])[1]")).sendKeys("1000");
+        driver.findElement(By.xpath("(//input[@data-testid='itemAddCart'])[1]")).click();
+        String cartNumber = driver.findElement(By.id("cartItemCountSpan")).getText();
+        Assert.assertEquals(cartNumber,"1000");
+    }
+
+    @Test(groups = {"smoke"})
+    public void chatBoxCheck(){
+        driver.get("https://www.webstaurantstore.com/");
+        Assert.assertTrue(driver.findElement(By.id("chat-button")).getText().contains("Online"));
+    }
+
+    @Test(groups = {"smoke"})
+    public void writeOnChatBox() throws IOException, InterruptedException {
+        driver.get("https://www.webstaurantstore.com/");
+        driver.findElement(By.id("chat-button")).click();
+        String nameChat = "WebstaurantStore Online Chat";
+        Set<String> windowHandles = driver.getWindowHandles();
+        for(String windowHandle:windowHandles){
+            driver.switchTo().window(windowHandle);
+            if (driver.getTitle().equals(nameChat)){
+                break;
+            }
+        }
+        driver.findElement(By.xpath("//input[@ng-keyup='submitChat($event)']")).sendKeys("Jonny");
+        driver.findElement(By.xpath("//button[@ng-click='continueToCase()']")).click();
+        driver.findElement(By.xpath("//input[@id='email']")).sendKeys("dfdfww@gmail.com");
+        Select selectSort = new Select(driver.findElement(By.xpath("//select[@ng-model='selectedCaseOption']")));
+        selectSort.selectByVisibleText("Account Related");
+        driver.findElement(By.xpath("//button[@ng-click='startChat()']")).click();
+        System.out.println(driver.getTitle());
+       Assert.assertEquals(driver.getTitle(),"WebstaurantStore Online Chat");
+       Thread.sleep(2000);
+        File screenShort = ((TakesScreenshot)driver).getScreenshotAs(OutputType.FILE);
+        FileUtils.copyFile(screenShort,new File("screenshotChat"+System.currentTimeMillis()+".png"));
+
+    }
 
 }

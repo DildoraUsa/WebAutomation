@@ -1,0 +1,15 @@
+<suite name="Cross Browser Test">
+
+    <test name="Browsers">
+
+        <classes>
+            <class name="projectWebAutomation.WebBrowsers">
+
+            </class>
+        </classes>
+    </test>
+
+
+
+
+</suite>

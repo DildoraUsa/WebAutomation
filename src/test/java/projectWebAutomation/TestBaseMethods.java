@@ -21,7 +21,7 @@ public class TestBaseMethods {
         driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(5));
         driver.manage().window().maximize();
     }
-    @AfterMethod
+    @AfterMethod(alwaysRun = true)
     public void tearDownMethod(){
 
         driver.quit();

@@ -1,0 +1,15 @@
+<suite name="Regression Test">
+    <test name="Products">
+        <groups>
+            <run>
+                <include name="regression"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="projectWebAutomation.checkSearchButtom"/>
+
+        </classes>
+
+    </test>
+
+</suite>
